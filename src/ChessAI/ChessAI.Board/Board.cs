@@ -28,6 +28,16 @@ public sealed class Board
     private ulong BlackRooks;   
     private ulong BlackPawns;
 
+    public const ulong RANK_1 = 0x00000000000000ff;
+    public const ulong RANK_2 = 0x000000000000ff00;
+    public const ulong RANK_3 = 0x0000000000ff0000;
+    public const ulong RANK_4 = 0x00000000ff000000;
+    public const ulong RANK_5 = 0x000000ff00000000;
+    public const ulong RANK_6 = 0x0000ff0000000000;
+    public const ulong RANK_7 = 0x00ff000000000000;
+    public const ulong RANK_8 = 0xff00000000000000;
+
+
     // Ref: https://gekomad.github.io/Cinnamon/BitboardCalculator/
     // Layout 2: little endian
     public void InitializeBoard()
@@ -45,5 +55,27 @@ public sealed class Board
         BlackKnights = 0x4200000000000000;
         BlackRooks = 0x8100000000000000;
         BlackPawns = 0x00ff000000000000;
+    }
+
+    public ulong GetOccupiedSquares()
+    {
+        return GetWhiteOccupiedSquares() & GetBlackOccupiedSquares();
+    }
+
+    public ulong GetWhiteOccupiedSquares()
+    {
+        return WhiteKing & WhiteQueens & WhiteBishops &
+            WhiteKnights & WhiteRooks & WhitePawns;
+    }
+
+    public ulong GetBlackOccupiedSquares()
+    {
+        return BlackKing & BlackQueens & BlackBishops &
+            BlackKnights & BlackRooks & BlackPawns;
+    }
+
+    public ulong GetEmptySquares()
+    {
+        return ~GetOccupiedSquares();
     }
 }
