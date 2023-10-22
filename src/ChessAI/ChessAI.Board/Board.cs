@@ -59,19 +59,19 @@ public sealed class Board
 
     public ulong GetOccupiedSquares()
     {
-        return GetWhiteOccupiedSquares() & GetBlackOccupiedSquares();
+        return GetWhiteOccupiedSquares() | GetBlackOccupiedSquares();
     }
 
     public ulong GetWhiteOccupiedSquares()
     {
-        return WhiteKing & WhiteQueens & WhiteBishops &
-            WhiteKnights & WhiteRooks & WhitePawns;
+        return WhiteKing | WhiteQueens | WhiteBishops |
+            WhiteKnights | WhiteRooks | WhitePawns;
     }
 
     public ulong GetBlackOccupiedSquares()
     {
-        return BlackKing & BlackQueens & BlackBishops &
-            BlackKnights & BlackRooks & BlackPawns;
+        return BlackKing | BlackQueens | BlackBishops |
+            BlackKnights | BlackRooks | BlackPawns;
     }
 
     public ulong GetEmptySquares()
