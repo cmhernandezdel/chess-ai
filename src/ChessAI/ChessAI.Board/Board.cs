@@ -19,7 +19,7 @@ public sealed class Board
     private ulong WhiteBishops;
     private ulong WhiteKnights;
     private ulong WhiteRooks;
-    private ulong WhitePawns;
+    public ulong WhitePawns;
 
     private ulong BlackKing;
     private ulong BlackQueens;
@@ -37,10 +37,9 @@ public sealed class Board
     public const ulong RANK_7 = 0x00ff000000000000;
     public const ulong RANK_8 = 0xff00000000000000;
 
-
     // Ref: https://gekomad.github.io/Cinnamon/BitboardCalculator/
     // Layout 2: little endian
-    public void InitializeBoard()
+    public Board()
     {
         WhiteKing = 0x0000000000000010;
         WhiteQueens = 0x0000000000000008;
