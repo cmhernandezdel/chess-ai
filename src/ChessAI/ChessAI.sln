@@ -5,7 +5,9 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAI.Board", "ChessAI.Board\ChessAI.Board.csproj", "{2F8DDE04-8EC9-45EE-8FA4-2762DA8725BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAI.App", "ChessAI.App\ChessAI.App.csproj", "{7FD6B24E-33A0-492C-A18E-17AEBD4D671B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAI.App", "ChessAI.App\ChessAI.App.csproj", "{7FD6B24E-33A0-492C-A18E-17AEBD4D671B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAI.Tests", "ChessAI.Tests\ChessAI.Tests.csproj", "{5B2775CA-9B70-4270-A5B4-58152AC6B24E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7FD6B24E-33A0-492C-A18E-17AEBD4D671B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FD6B24E-33A0-492C-A18E-17AEBD4D671B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7FD6B24E-33A0-492C-A18E-17AEBD4D671B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
