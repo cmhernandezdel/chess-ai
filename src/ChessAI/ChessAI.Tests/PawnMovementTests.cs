@@ -2,7 +2,7 @@ using ChessAI.Board.Pieces;
 
 namespace ChessAI.Tests;
 
-public sealed class PieceMovementTests
+public sealed class PawnMovementTests
 {
     public static IEnumerable<object[]> DoublePushTestData =>
         new List<object[]>
