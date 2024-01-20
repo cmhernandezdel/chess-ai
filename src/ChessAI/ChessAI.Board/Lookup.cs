@@ -8,14 +8,17 @@ public class Lookup
     private readonly int squares = EnumExtensions.Count<Board.Square>();
 
     public readonly Bitboard[,] pawnAttacks;
+    public readonly Bitboard[] knightAttacks;
 
     public Lookup()
     {
         pawnAttacks = new Bitboard[sides, squares];
+        knightAttacks = new Bitboard[squares];
         InitializePawnAttacks();
+        InitializeKnightAttacks();
     }
 
-    public void InitializePawnAttacks()
+    private void InitializePawnAttacks()
     {
         for (int square = 0; square < squares; square++)
         {
@@ -25,7 +28,25 @@ public class Lookup
             pawnAttacks[(int)Board.Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
             pawnAttacks[(int)Board.Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
         }
+    }
 
+    private void InitializeKnightAttacks()
+    {
+        for (int square = 0; square < squares; square++)
+        {
+            var bb = Bitboard.EmptyBitboard();
+            bb.SetBit((Board.Square)square);
+
+            knightAttacks[square] =
+                bb.RankUp().RankUp().FileDown() |
+                bb.RankUp().RankUp().FileUp() |
+                bb.RankDown().RankDown().FileDown() |
+                bb.RankDown().RankDown().FileUp() |
+                bb.RankUp().FileUp().FileUp() |
+                bb.RankUp().FileDown().FileDown() |
+                bb.RankDown().FileUp().FileUp() |
+                bb.RankDown().FileDown().FileDown();
+        }
     }
 
 
