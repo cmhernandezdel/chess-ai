@@ -1,5 +1,9 @@
 ﻿namespace ChessAI.Board;
 
+/// <summary>
+/// Representation of the board.
+/// Layout 2: https://gekomad.github.io/Cinnamon/BitboardCalculator/
+/// </summary>
 public sealed class Board
 {
     public enum Square
@@ -13,6 +17,12 @@ public sealed class Board
         a2, b2, c2, d2, e2, f2, g2, h2,
         a1, b1, c1, d1, e1, f1, g1, h1,
     };
+
+    public enum Side
+    {
+        White = 0,
+        Black = 1
+    }
 
     private ulong WhiteKing;
     private ulong WhiteQueens;

@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessAI.App", "ChessAI.App\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAI.Tests", "ChessAI.Tests\ChessAI.Tests.csproj", "{5B2775CA-9B70-4270-A5B4-58152AC6B24E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessAI.Shared", "ChessAI.Shared\ChessAI.Shared.csproj", "{DD32BFD7-DE3D-478A-BDBC-D10799DAA486}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B2775CA-9B70-4270-A5B4-58152AC6B24E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD32BFD7-DE3D-478A-BDBC-D10799DAA486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD32BFD7-DE3D-478A-BDBC-D10799DAA486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD32BFD7-DE3D-478A-BDBC-D10799DAA486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD32BFD7-DE3D-478A-BDBC-D10799DAA486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
