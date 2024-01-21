@@ -7,7 +7,7 @@ stopwatch.Stop();
 Console.WriteLine("Lookup tables construction: " + stopwatch.ElapsedMilliseconds + " ms");
 
 stopwatch.Restart();
-var attacks = lookup.knightAttacks[(int)Board.Square.g4];
+var attacks = lookup.kingAttacks[(int)Board.Square.h1];
 stopwatch.Stop();
 Console.WriteLine("Lookup attacks: " + stopwatch.ElapsedMilliseconds + " ms");
 

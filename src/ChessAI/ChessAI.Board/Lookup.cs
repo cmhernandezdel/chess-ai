@@ -9,13 +9,16 @@ public class Lookup
 
     public readonly Bitboard[,] pawnAttacks;
     public readonly Bitboard[] knightAttacks;
+    public readonly Bitboard[] kingAttacks;
 
     public Lookup()
     {
         pawnAttacks = new Bitboard[sides, squares];
         knightAttacks = new Bitboard[squares];
+        kingAttacks = new Bitboard[squares];
         InitializePawnAttacks();
         InitializeKnightAttacks();
+        InitializeKingAttacks();
     }
 
     private void InitializePawnAttacks()
@@ -46,6 +49,20 @@ public class Lookup
                 bb.RankUp().FileDown().FileDown() |
                 bb.RankDown().FileUp().FileUp() |
                 bb.RankDown().FileDown().FileDown();
+        }
+    }
+
+    private void InitializeKingAttacks()
+    {
+        for (int square = 0; square < squares; square++)
+        {
+            var bb = Bitboard.EmptyBitboard();
+            bb.SetBit((Board.Square)square);
+
+            kingAttacks[square] = 
+                bb.RankDown() | bb.RankUp() | bb.FileDown() | bb.FileUp() |
+                bb.RankDown().FileDown() | bb.RankDown().FileUp() |
+                bb.RankUp().FileDown() | bb.RankUp().FileUp();
         }
     }
 
