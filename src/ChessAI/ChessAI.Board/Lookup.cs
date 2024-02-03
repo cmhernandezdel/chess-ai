@@ -59,11 +59,115 @@ public class Lookup
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Board.Square)square);
 
-            kingAttacks[square] = 
+            kingAttacks[square] =
                 bb.RankDown() | bb.RankUp() | bb.FileDown() | bb.FileUp() |
                 bb.RankDown().FileDown() | bb.RankDown().FileUp() |
                 bb.RankUp().FileDown() | bb.RankUp().FileUp();
         }
+    }
+
+    // See: https://www.chessprogramming.org/Magic_Bitboards
+    public Bitboard InitializeBishopAttacks()
+    {
+        return CalculateBishopRelevantOccupancyBitboard((int)Board.Square.d4);
+    }
+
+    public Bitboard InitializeRookAttacks()
+    {
+        return CalculateRookRelevantOccupancyBitboard((int)Board.Square.d4);
+    }
+
+    // Given the position of the bishop, calculate the relevant occupancy squares
+    // These squares exclude anything in ranks 1 and 8 and anything in files a and h
+    // because no matter what stands there, they are always under attack if nothing blocks it
+    // (i.e., we do not care about their occupancy)
+    private Bitboard CalculateBishopRelevantOccupancyBitboard(int square)
+    {
+        var bb = Bitboard.EmptyBitboard();
+        var mask = new Bitboard(1);
+        var targetRank = square / 8;
+        var targetFile = square % 8;
+
+        // For each diagonal, initialize
+        int rank = targetRank + 1, file = targetFile + 1;
+        while (rank <= 6 && file <= 6)
+        {
+            bb |= mask << (rank * 8 + file);
+            rank++;
+            file++;
+        }
+
+        rank = targetRank - 1;
+        file = targetFile + 1;
+        while (rank >= 1 && file <= 6)
+        {
+            bb |= mask << (rank * 8 + file);
+            rank--;
+            file++;
+        }
+
+        rank = targetRank + 1;
+        file = targetFile - 1;
+        while (rank <= 6 && file >= 1)
+        {
+            bb |= mask << (rank * 8 + file);
+            rank++;
+            file--;
+        }
+
+        rank = targetRank - 1;
+        file = targetFile - 1;
+        while (rank >= 1 && file >= 1)
+        {
+            bb |= mask << (rank * 8 + file);
+            rank--;
+            file--;
+        }
+
+        return bb;
+    }
+
+    // Given the position of the rook, calculate the relevant occupancy squares
+    // These squares exclude anything in ranks 1 and 8 and anything in files a and h
+    // because no matter what stands there, they are always under attack if nothing blocks it
+    // (i.e., we do not care about their occupancy)
+    private Bitboard CalculateRookRelevantOccupancyBitboard(int square)
+    {
+        var bb = Bitboard.EmptyBitboard();
+        var mask = new Bitboard(1);
+        var targetRank = square / 8;
+        var targetFile = square % 8;
+
+        // For each line, initialize
+        int rank = targetRank + 1;
+        while (rank <= 6)
+        {
+            bb |= mask << (rank * 8 + targetFile);
+            rank++;
+        }
+
+        rank = targetRank - 1;
+        while (rank >= 1)
+        {
+            bb |= mask << (rank * 8 + targetFile);
+            rank--;
+        }
+
+        int file = targetFile + 1;
+        while (file <= 6)
+        {
+            bb |= mask << (targetRank * 8 + file);
+            file++;
+        }
+
+        file = targetFile - 1;
+        while (file >= 1)
+        {
+            bb |= mask << (targetRank * 8 + file);
+            file--;
+        }
+
+        return bb;
     }
 
 
