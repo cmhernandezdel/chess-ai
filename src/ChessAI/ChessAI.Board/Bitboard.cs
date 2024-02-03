@@ -24,6 +24,8 @@ public class Bitboard(ulong value)
     public static Bitboard operator >>(Bitboard a, int b) => new(a.Value >> b);
     public static Bitboard operator +(Bitboard a, ulong b) => new(a.Value + b);
     public static Bitboard operator -(Bitboard a, ulong b) => new(a.Value - b);
+    public static Bitboard operator *(Bitboard a, ulong b) => new(a.Value * b);
+    public static Bitboard operator -(Bitboard a) => unchecked(new((ulong)-(long)a.Value));
 
     public static bool operator ==(Bitboard a, Bitboard b) => a.Equals(b);
     public static bool operator !=(Bitboard a, Bitboard b) => !a.Equals(b);
@@ -34,16 +36,31 @@ public class Bitboard(ulong value)
     public byte GetBit(Board.Square square) => GetBit((int)square);
     public void SetBit(Board.Square square) => SetBit((int)square);
     public void UnsetBit(Board.Square square) => UnsetBit((int)square);
-    public int CountBits() {
+    public int CountBits()
+    {
         int count = 0;
         var bitboard = Copy();
-        while (bitboard.Value > 0) 
+        while (bitboard.Value > 0)
         {
             count++;
             bitboard &= bitboard - 1;
         }
-        
+
         return count;
+    }
+
+    // Least significant bit = closer to a8, set = set to 1
+    public int GetLeastSignificantBitSetIndex()
+    {
+        var bitboard = Copy();
+
+        if (bitboard == EmptyBitboard())
+        {
+            throw new ArgumentOutOfRangeException();
+        }
+
+        bitboard = (bitboard & -bitboard) - 1;
+        return bitboard.CountBits();
     }
 
     // -- MASKS --
