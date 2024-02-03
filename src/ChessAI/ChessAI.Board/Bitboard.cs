@@ -14,6 +14,7 @@ public class Bitboard(ulong value)
 
     // -- FACTORY METHODS --
     public static Bitboard EmptyBitboard() => new(0);
+    public Bitboard Copy() => new(Value);
 
     // -- OPERATORS --
     public static Bitboard operator &(Bitboard a, Bitboard b) => new(a.Value & b.Value);
@@ -21,6 +22,8 @@ public class Bitboard(ulong value)
     public static Bitboard operator ~(Bitboard a) => new(~a.Value);
     public static Bitboard operator <<(Bitboard a, int b) => new(a.Value << b);
     public static Bitboard operator >>(Bitboard a, int b) => new(a.Value >> b);
+    public static Bitboard operator +(Bitboard a, ulong b) => new(a.Value + b);
+    public static Bitboard operator -(Bitboard a, ulong b) => new(a.Value - b);
 
     public static bool operator ==(Bitboard a, Bitboard b) => a.Equals(b);
     public static bool operator !=(Bitboard a, Bitboard b) => !a.Equals(b);
@@ -31,6 +34,17 @@ public class Bitboard(ulong value)
     public byte GetBit(Board.Square square) => GetBit((int)square);
     public void SetBit(Board.Square square) => SetBit((int)square);
     public void UnsetBit(Board.Square square) => UnsetBit((int)square);
+    public int CountBits() {
+        int count = 0;
+        var bitboard = Copy();
+        while (bitboard.Value > 0) 
+        {
+            count++;
+            bitboard &= bitboard - 1;
+        }
+        
+        return count;
+    }
 
     // -- MASKS --
     public static Bitboard A_FILE() => new(0x101010101010101);
