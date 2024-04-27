@@ -11,6 +11,33 @@ public class Lookup
     public readonly Bitboard[] knightAttacks;
     public readonly Bitboard[] kingAttacks;
 
+    // This means: if a bishop is on a given square, how many squares are relevant
+    // (not counting the edges of the board), i.e. how many squares it can move to
+    public readonly int[] bishopRelevantBits =
+    [
+        6, 5, 5, 5, 5, 5, 5, 6,
+        5, 5, 5, 5, 5, 5, 5, 5,
+        5, 5, 7, 7, 7, 7, 5, 5,
+        5, 5, 7, 9, 9, 7, 5, 5,
+        5, 5, 7, 9, 9, 7, 5, 5,
+        5, 5, 7, 7, 7, 7, 5, 5,
+        5, 5, 5, 5, 5, 5, 5, 5,
+        6, 5, 5, 5, 5, 5, 5, 6
+    ];
+
+    // The same but with the rook instead of the bishop
+    public readonly int[] rookRelevantBits =
+    [
+        12, 11, 11, 11, 11, 11, 11, 12,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        11, 10, 10, 10, 10, 10, 10, 11,
+        12, 11, 11, 11, 11, 11, 11, 12,
+    ];
+
     public Lookup()
     {
         pawnAttacks = new Bitboard[sides, squares];
