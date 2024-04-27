@@ -70,15 +70,13 @@ public class Lookup
     public Bitboard InitializeBishopAttacks()
     {
         var blocks = Bitboard.EmptyBitboard();
-        blocks.SetBit(Board.Square.e5);
         return CalculateBishopAttacks((int)Board.Square.d4, blocks);
     }
 
     public Bitboard InitializeRookAttacks()
     {
         var blocks = Bitboard.EmptyBitboard();
-        blocks.SetBit(Board.Square.d5);
-        return CalculateRookAttacks((int)Board.Square.d4, blocks);
+        return CalculateRookAttacks((int)Board.Square.a1, blocks);
     }
 
     // Given the position of the bishop, calculate the relevant occupancy squares
@@ -259,7 +257,7 @@ public class Lookup
 
         // For each line, initialize
         int rank = targetRank + 1;
-        while (rank <= 7)
+        while (rank <= 6)
         {
             var square = rank * 8 + targetFile;
             bb |= mask << (square);
@@ -273,7 +271,7 @@ public class Lookup
         }
 
         rank = targetRank - 1;
-        while (rank >= 0)
+        while (rank >= 1)
         {
             var square = rank * 8 + targetFile;
             bb |= mask << (square);
@@ -287,7 +285,7 @@ public class Lookup
         }
 
         int file = targetFile + 1;
-        while (file <= 7)
+        while (file <= 6)
         {
             var square = targetRank * 8 + file;
             bb |= mask << (square);
@@ -301,7 +299,7 @@ public class Lookup
         }
 
         file = targetFile - 1;
-        while (file >= 0)
+        while (file >= 1)
         {
             var square = targetRank * 8 + file;
             bb |= mask << (square);

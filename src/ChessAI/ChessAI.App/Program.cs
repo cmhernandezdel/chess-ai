@@ -7,11 +7,12 @@ stopwatch.Stop();
 Console.WriteLine("Lookup tables construction: " + stopwatch.ElapsedMilliseconds + " ms");
 
 stopwatch.Restart();
-var attacks = lookup.kingAttacks[(int)Board.Square.h1];
+var attacks = lookup.InitializeRookAttacks();
 stopwatch.Stop();
 Console.WriteLine("Lookup attacks: " + stopwatch.ElapsedMilliseconds + " ms");
 
 stopwatch.Restart();
-Console.WriteLine(attacks);
+var bb = MagicNumbers.SetOccupancy(4095, attacks.CountBits(), attacks);
+Console.WriteLine(bb);
 stopwatch.Stop();
 Console.WriteLine("Print board: " + stopwatch.ElapsedMilliseconds + " ms");
