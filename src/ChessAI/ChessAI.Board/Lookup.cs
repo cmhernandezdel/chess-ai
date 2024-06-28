@@ -110,7 +110,7 @@ public class Lookup
     // These squares exclude anything in ranks 1 and 8 and anything in files a and h
     // because no matter what stands there, they are always under attack if nothing blocks it
     // (i.e., we do not care about their occupancy)
-    private Bitboard CalculateBishopRelevantOccupancyBitboard(int square)
+    public static Bitboard CalculateBishopRelevantOccupancyBitboard(int square)
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
@@ -160,7 +160,7 @@ public class Lookup
     // These squares exclude anything in ranks 1 and 8 and anything in files a and h
     // because no matter what stands there, they are always under attack if nothing blocks it
     // (i.e., we do not care about their occupancy)
-    private Bitboard CalculateRookRelevantOccupancyBitboard(int square)
+    public static Bitboard CalculateRookRelevantOccupancyBitboard(int square)
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
@@ -200,7 +200,7 @@ public class Lookup
     }
 
     // Calculate the bishop attacks given an occupancy table
-    private Bitboard CalculateBishopAttacks(int bishopSquare, Bitboard occupancy)
+    public static Bitboard CalculateBishopAttacks(int bishopSquare, Bitboard occupancy)
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
@@ -275,7 +275,7 @@ public class Lookup
     }
 
     // Calculate the rook attacks given an occupancy table
-    private Bitboard CalculateRookAttacks(int rookSquare, Bitboard occupancy)
+    public static Bitboard CalculateRookAttacks(int rookSquare, Bitboard occupancy)
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);

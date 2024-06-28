@@ -29,7 +29,7 @@ public sealed class Board
     private ulong WhiteBishops;
     private ulong WhiteKnights;
     private ulong WhiteRooks;
-    public ulong WhitePawns;
+    private ulong WhitePawns;
 
     private ulong BlackKing;
     private ulong BlackQueens;

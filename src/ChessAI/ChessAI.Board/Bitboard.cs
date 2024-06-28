@@ -5,8 +5,8 @@ namespace ChessAI.Board;
 /// <summary>
 /// Representation of a bitboard. This is a wrapper around an unsigned long,
 /// but it has methods for bitwise operations. A bitboard is nothing else but
-/// the representation of the positions of a certain type of piece in the board.
-/// https://www.chessprogramming.org/General_Setwise_Operations#Bit_by_Square
+/// the representation of the positions of a certain type of piece in the board. <br/>
+/// See: https://www.chessprogramming.org/General_Setwise_Operations#Bit_by_Square
 /// </summary>
 public class Bitboard(ulong value)
 {
