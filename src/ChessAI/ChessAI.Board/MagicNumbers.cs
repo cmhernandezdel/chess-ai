@@ -51,7 +51,6 @@ public sealed class MagicNumbers
         var attackMask = bishop ? 
             Lookup.CalculateBishopRelevantOccupancyBitboard(square) :
             Lookup.CalculateRookRelevantOccupancyBitboard(square);
-        Console.WriteLine(attackMask);
         var occupancyIndices = 1 << relevantBits;
         
         for (var i = 0; i < occupancyIndices; ++i)
@@ -64,7 +63,6 @@ public sealed class MagicNumbers
         for (var randomCount = 0; randomCount < 100000000; ++randomCount)
         {
             var magicNumber = GenerateMagicNumberCandidate();
-            Console.WriteLine("Magic number candidate: " + magicNumber);
             var x = attackMask * magicNumber;
             x &= new Bitboard(0xFF00000000000000);
             if (x.CountBits() < 6) continue;
