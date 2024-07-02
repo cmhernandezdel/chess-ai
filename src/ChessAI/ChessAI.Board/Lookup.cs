@@ -13,7 +13,7 @@ public class Lookup
 
     // This means: if a bishop is on a given square, how many squares are relevant
     // (not counting the edges of the board), i.e. how many squares it can move to
-    public readonly int[] bishopRelevantBits =
+    public static readonly int[] bishopRelevantBits =
     [
         6, 5, 5, 5, 5, 5, 5, 6,
         5, 5, 5, 5, 5, 5, 5, 5,
@@ -26,7 +26,7 @@ public class Lookup
     ];
 
     // The same but with the rook instead of the bishop
-    public readonly int[] rookRelevantBits =
+    public static readonly int[] rookRelevantBits =
     [
         12, 11, 11, 11, 11, 11, 11, 12,
         11, 10, 10, 10, 10, 10, 10, 11,

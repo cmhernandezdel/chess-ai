@@ -16,13 +16,14 @@ public sealed class MagicNumbers
     
     public static Bitboard SetOccupancy(int index, int bitsInMask, Bitboard attackMask)
     {
+        var attackMaskCopy = attackMask.Copy();
         var occupancy = Bitboard.EmptyBitboard();
         var indexBitboard = new Bitboard(Convert.ToUInt64(index));
 
         for (var i = 0; i < bitsInMask; ++i)
         {
-            var square = attackMask.GetLeastSignificantBitSetIndex();
-            attackMask.UnsetBit((Board.Square)square);
+            var square = attackMaskCopy.GetLeastSignificantBitSetIndex();
+            attackMaskCopy.UnsetBit((Board.Square)square);
             if (indexBitboard.GetBit((Board.Square)i) == 1)
             {
                 occupancy.SetBit((Board.Square)square);
@@ -50,23 +51,26 @@ public sealed class MagicNumbers
         var attackMask = bishop ? 
             Lookup.CalculateBishopRelevantOccupancyBitboard(square) :
             Lookup.CalculateRookRelevantOccupancyBitboard(square);
-        int occupancyIndices = 1 << relevantBits;
-        for (int i = 0; i < occupancyIndices; ++i)
+        Console.WriteLine(attackMask);
+        var occupancyIndices = 1 << relevantBits;
+        
+        for (var i = 0; i < occupancyIndices; ++i)
         {
             occupancies[i] = SetOccupancy(i, relevantBits, attackMask);
             attacks[i] = bishop ? Lookup.CalculateBishopAttacks(square, occupancies[i]) :
                 Lookup.CalculateRookAttacks(square, occupancies[i]);
         }
 
-        for (int randomCount = 0; randomCount < 100000000; ++randomCount)
+        for (var randomCount = 0; randomCount < 100000000; ++randomCount)
         {
             var magicNumber = GenerateMagicNumberCandidate();
+            Console.WriteLine("Magic number candidate: " + magicNumber);
             var x = attackMask * magicNumber;
             x &= new Bitboard(0xFF00000000000000);
             if (x.CountBits() < 6) continue;
             var failed = false;
 
-            usedAttacks = new Bitboard[4096];
+            Array.Fill(usedAttacks, Bitboard.EmptyBitboard());
             for (var index = 0; index < occupancyIndices; ++index)
             {
                 if (failed) break;
@@ -85,5 +89,15 @@ public sealed class MagicNumbers
         }
         
         return 0ul;
+    }
+
+    public void InitMagicNumbers()
+    {
+        for (int square = 0; square < 64; ++square)
+        {
+            // bishop magic numbers
+            var mn = FindMagicNumber(square, Lookup.bishopRelevantBits[square], true );
+            Console.WriteLine(mn);
+        }
     }
 }
