@@ -38,6 +38,9 @@ public class Lookup
         12, 11, 11, 11, 11, 11, 11, 12,
     ];
 
+    public readonly ulong[] bishopMagicNumbers;
+    public readonly ulong[] rookMagicNumbers;
+
     public Lookup()
     {
         pawnAttacks = new Bitboard[sides, squares];
@@ -46,6 +49,10 @@ public class Lookup
         InitializePawnAttacks();
         InitializeKnightAttacks();
         InitializeKingAttacks();
+        var magicNumbersGenerator = new MagicNumbersGenerator();
+        var magicNumbers = magicNumbersGenerator.InitMagicNumbers();
+        bishopMagicNumbers = magicNumbers.Item1;
+        rookMagicNumbers = magicNumbers.Item2;
     }
 
     private void InitializePawnAttacks()
