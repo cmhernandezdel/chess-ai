@@ -2,6 +2,10 @@ using System.Text;
 
 namespace ChessAI.Board;
 
+// This might not be the best idea after all because boxing (converting a value type to a reference type)
+// affects performance, because instead of being stored in the stack, they are stored in the managed heap
+// so the CLR takes the value from the stack, copies it to the heap, and then it has to be garbage-collected.
+
 /// <summary>
 /// Representation of a bitboard. This is a wrapper around an unsigned long,
 /// but it has methods for bitwise operations. A bitboard is nothing else but
