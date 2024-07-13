@@ -62,6 +62,24 @@ public class Bitboard(ulong value)
         bitboard = (bitboard & -bitboard) - 1;
         return bitboard.CountBits();
     }
+    
+    public Bitboard SetOccupancy(int index, int bitsInMask)
+    {
+        var attackMaskCopy = Copy();
+        var occupancy = EmptyBitboard();
+        var indexBitboard = new Bitboard(Convert.ToUInt64(index));
+
+        for (var i = 0; i < bitsInMask; ++i)
+        {
+            var square = attackMaskCopy.GetLeastSignificantBitSetIndex();
+            attackMaskCopy.UnsetBit((Board.Square)square);
+            if (indexBitboard.GetBit((Board.Square)i) == 1)
+            {
+                occupancy.SetBit((Board.Square)square);
+            }
+        }
+        return occupancy;
+    }
 
     // -- MASKS --
     public static Bitboard A_FILE() => new(0x101010101010101);
@@ -104,15 +122,15 @@ public class Bitboard(ulong value)
             for (int file = 0; file < 8; file++)
             {
                 int square = rank * 8 + file;
-                if (file == 0) sb.AppendFormat("  {0} ", 8 - rank);
-                sb.AppendFormat(" {0}", GetBit(square));
+                if (file == 0) sb.Append($"  {8 - rank} ");
+                sb.Append($" {GetBit(square)}");
             }
             sb.Append('\n');
         }
 
         sb.Append("\n     a b c d e f g h\n");
         sb.Append('\n');
-        sb.AppendFormat("Bitboard: {0}", Value);
+        sb.Append($"Bitboard: {Value}");
         return sb.ToString();
     }
 

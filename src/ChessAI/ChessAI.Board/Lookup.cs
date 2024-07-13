@@ -4,16 +4,18 @@ namespace ChessAI.Board;
 
 public class Lookup
 {
-    private readonly int sides = EnumExtensions.Count<Board.Side>();
-    private readonly int squares = EnumExtensions.Count<Board.Square>();
+    private readonly int _sides = EnumExtensions.Count<Board.Side>();
+    private readonly int _squares = EnumExtensions.Count<Board.Square>();
 
-    public readonly Bitboard[,] pawnAttacks;
-    public readonly Bitboard[] knightAttacks;
-    public readonly Bitboard[] kingAttacks;
+    private readonly Bitboard[,] _pawnAttacks;
+    private readonly Bitboard[] _knightAttacks;
+    private readonly Bitboard[] _kingAttacks;
+    private readonly Bitboard[,] _bishopAttacks;
+    private readonly Bitboard[,] _rookAttacks;
 
     // This means: if a bishop is on a given square, how many squares are relevant
     // (not counting the edges of the board), i.e. how many squares it can move to
-    public static readonly int[] bishopRelevantBits =
+    public static readonly int[] BishopRelevantBits =
     [
         6, 5, 5, 5, 5, 5, 5, 6,
         5, 5, 5, 5, 5, 5, 5, 5,
@@ -26,7 +28,7 @@ public class Lookup
     ];
 
     // The same but with the rook instead of the bishop
-    public static readonly int[] rookRelevantBits =
+    public static readonly int[] RookRelevantBits =
     [
         12, 11, 11, 11, 11, 11, 11, 12,
         11, 10, 10, 10, 10, 10, 10, 11,
@@ -38,43 +40,54 @@ public class Lookup
         12, 11, 11, 11, 11, 11, 11, 12,
     ];
 
-    public readonly ulong[] bishopMagicNumbers;
-    public readonly ulong[] rookMagicNumbers;
+    private readonly ulong[] _bishopMagicNumbers;
+    private readonly ulong[] _rookMagicNumbers;
+
+    private readonly Bitboard[] _bishopMasks;
+    private readonly Bitboard[] _rookMasks;
 
     public Lookup()
     {
-        pawnAttacks = new Bitboard[sides, squares];
-        knightAttacks = new Bitboard[squares];
-        kingAttacks = new Bitboard[squares];
+        _pawnAttacks = new Bitboard[_sides, _squares];
+        _knightAttacks = new Bitboard[_squares];
+        _kingAttacks = new Bitboard[_squares];
+        _bishopAttacks = new Bitboard[_squares, 512];
+        _rookAttacks = new Bitboard[_squares, 4096];
+        _bishopMasks = new Bitboard[_squares];
+        _rookMasks = new Bitboard[_squares];
+        
+        var magicNumbersGenerator = new MagicNumbersGenerator();
+        var magicNumbers = magicNumbersGenerator.InitMagicNumbers();
+        _bishopMagicNumbers = magicNumbers.Item1;
+        _rookMagicNumbers = magicNumbers.Item2;
+        
         InitializePawnAttacks();
         InitializeKnightAttacks();
         InitializeKingAttacks();
-        var magicNumbersGenerator = new MagicNumbersGenerator();
-        var magicNumbers = magicNumbersGenerator.InitMagicNumbers();
-        bishopMagicNumbers = magicNumbers.Item1;
-        rookMagicNumbers = magicNumbers.Item2;
+        InitializeBishopAttacks();
+        InitializeRookAttacks();
     }
 
     private void InitializePawnAttacks()
     {
-        for (int square = 0; square < squares; square++)
+        for (var square = 0; square < _squares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Board.Square)square);
 
-            pawnAttacks[(int)Board.Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
-            pawnAttacks[(int)Board.Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
+            _pawnAttacks[(int)Board.Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
+            _pawnAttacks[(int)Board.Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
         }
     }
 
     private void InitializeKnightAttacks()
     {
-        for (int square = 0; square < squares; square++)
+        for (var square = 0; square < _squares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Board.Square)square);
 
-            knightAttacks[square] =
+            _knightAttacks[square] =
                 bb.RankUp().RankUp().FileDown() |
                 bb.RankUp().RankUp().FileUp() |
                 bb.RankDown().RankDown().FileDown() |
@@ -88,12 +101,12 @@ public class Lookup
 
     private void InitializeKingAttacks()
     {
-        for (int square = 0; square < squares; square++)
+        for (var square = 0; square < _squares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Board.Square)square);
 
-            kingAttacks[square] =
+            _kingAttacks[square] =
                 bb.RankDown() | bb.RankUp() | bb.FileDown() | bb.FileUp() |
                 bb.RankDown().FileDown() | bb.RankDown().FileUp() |
                 bb.RankUp().FileDown() | bb.RankUp().FileUp();
@@ -101,16 +114,44 @@ public class Lookup
     }
 
     // See: https://www.chessprogramming.org/Magic_Bitboards
-    public Bitboard InitializeBishopAttacks()
+    private void InitializeBishopAttacks()
     {
-        var blocks = Bitboard.EmptyBitboard();
-        return CalculateBishopAttacks((int)Board.Square.d4, blocks);
+        for (var square = 0; square < _squares; square++)
+        {
+            _bishopMasks[square] = CalculateBishopRelevantOccupancyBitboard(square);
+            var attackMask = _bishopMasks[square];
+            var relevantBitsCount = attackMask.CountBits();
+            var occupancyIndices = 1 << relevantBitsCount;
+
+            for (var index = 0; index < occupancyIndices; index++)
+            {
+                var occupancy = attackMask.SetOccupancy(index, relevantBitsCount);
+                var magicIndex =
+                    Convert.ToInt32(((occupancy * _bishopMagicNumbers[square]) >> (64 - BishopRelevantBits[square]))
+                        .Value);
+                _bishopAttacks[square, magicIndex] = CalculateBishopAttacks(square, occupancy);
+            }
+        }
     }
 
-    public Bitboard InitializeRookAttacks()
+    private void InitializeRookAttacks()
     {
-        var blocks = Bitboard.EmptyBitboard();
-        return CalculateRookAttacks((int)Board.Square.a1, blocks);
+        for (var square = 0; square < _squares; square++)
+        {
+            _rookMasks[square] = CalculateRookRelevantOccupancyBitboard(square);
+            var attackMask = _rookMasks[square];
+            var relevantBitsCount = attackMask.CountBits();
+            var occupancyIndices = 1 << relevantBitsCount;
+
+            for (var index = 0; index < occupancyIndices; index++)
+            {
+                var occupancy = attackMask.SetOccupancy(index, relevantBitsCount);
+                var magicIndex =
+                    Convert.ToInt32(((occupancy * _rookMagicNumbers[square]) >> (64 - RookRelevantBits[square]))
+                        .Value);
+                _rookAttacks[square, magicIndex] = CalculateRookAttacks(square, occupancy);
+            }
+        }
     }
 
     // Given the position of the bishop, calculate the relevant occupancy squares
@@ -175,7 +216,7 @@ public class Lookup
         var targetFile = square % 8;
 
         // For each line, initialize
-        int rank = targetRank + 1;
+        var rank = targetRank + 1;
         while (rank <= 6)
         {
             bb |= mask << (rank * 8 + targetFile);
@@ -189,7 +230,7 @@ public class Lookup
             rank--;
         }
 
-        int file = targetFile + 1;
+        var file = targetFile + 1;
         while (file <= 6)
         {
             bb |= mask << (targetRank * 8 + file);
@@ -290,7 +331,7 @@ public class Lookup
         var targetFile = rookSquare % 8;
 
         // For each line, initialize
-        int rank = targetRank + 1;
+        var rank = targetRank + 1;
         while (rank <= 6)
         {
             var square = rank * 8 + targetFile;
@@ -318,7 +359,7 @@ public class Lookup
             rank--;
         }
 
-        int file = targetFile + 1;
+        var file = targetFile + 1;
         while (file <= 6)
         {
             var square = targetRank * 8 + file;
@@ -347,5 +388,23 @@ public class Lookup
         }
 
         return bb;
+    }
+
+    public Bitboard GetBishopAttacks(int square, Bitboard occupancy)
+    {
+        var occupancyCopy = occupancy.Copy();
+        occupancyCopy &= _bishopMasks[square];
+        occupancyCopy *= _bishopMagicNumbers[square];
+        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (64 - BishopRelevantBits[square])).Value);
+        return _bishopAttacks[square, occupancyIndex];
+    }
+    
+    public Bitboard GetRookAttacks(int square, Bitboard occupancy)
+    {
+        var occupancyCopy = occupancy.Copy();
+        occupancyCopy &= _rookMasks[square];
+        occupancyCopy *= _rookMagicNumbers[square];
+        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (64 - RookRelevantBits[square])).Value);
+        return _rookAttacks[square, occupancyIndex];
     }
 }

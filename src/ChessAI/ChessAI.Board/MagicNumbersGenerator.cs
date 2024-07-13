@@ -14,23 +14,7 @@ public sealed class MagicNumbersGenerator
 {
     private readonly PseudoRandomNumberGenerator _generator = new();
     
-    private static Bitboard SetOccupancy(int index, int bitsInMask, Bitboard attackMask)
-    {
-        var attackMaskCopy = attackMask.Copy();
-        var occupancy = Bitboard.EmptyBitboard();
-        var indexBitboard = new Bitboard(Convert.ToUInt64(index));
-
-        for (var i = 0; i < bitsInMask; ++i)
-        {
-            var square = attackMaskCopy.GetLeastSignificantBitSetIndex();
-            attackMaskCopy.UnsetBit((Board.Square)square);
-            if (indexBitboard.GetBit((Board.Square)i) == 1)
-            {
-                occupancy.SetBit((Board.Square)square);
-            }
-        }
-        return occupancy;
-    }
+    
     
     /// <summary>
     /// Generates a magic number candidate. <br/>
@@ -53,13 +37,13 @@ public sealed class MagicNumbersGenerator
         var occupancies = new Bitboard[4096];
         var attacks = new Bitboard[4096];
         var usedAttacks = new Bitboard[4096];
-        var relevantBits = Lookup.bishopRelevantBits[square];
+        var relevantBits = Lookup.BishopRelevantBits[square];
         var attackMask = Lookup.CalculateBishopRelevantOccupancyBitboard(square);
         var occupancyIndices = 1 << relevantBits;
         
         for (var i = 0; i < occupancyIndices; ++i)
         {
-            occupancies[i] = SetOccupancy(i, relevantBits, attackMask);
+            occupancies[i] = attackMask.SetOccupancy(i, relevantBits);
             attacks[i] = Lookup.CalculateBishopAttacks(square, occupancies[i]);
         }
 
@@ -102,13 +86,13 @@ public sealed class MagicNumbersGenerator
         var occupancies = new Bitboard[4096];
         var attacks = new Bitboard[4096];
         var usedAttacks = new Bitboard[4096];
-        var relevantBits = Lookup.rookRelevantBits[square];
+        var relevantBits = Lookup.RookRelevantBits[square];
         var attackMask = Lookup.CalculateRookRelevantOccupancyBitboard(square);
         var occupancyIndices = 1 << relevantBits;
         
         for (var i = 0; i < occupancyIndices; ++i)
         {
-            occupancies[i] = SetOccupancy(i, relevantBits, attackMask);
+            occupancies[i] = attackMask.SetOccupancy(i, relevantBits);
             attacks[i] = Lookup.CalculateRookAttacks(square, occupancies[i]);
         }
 
