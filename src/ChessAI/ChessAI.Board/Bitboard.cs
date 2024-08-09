@@ -42,7 +42,7 @@ public class Bitboard(ulong value)
     public void UnsetBit(Board.Square square) => UnsetBit((int)square);
     public int CountBits()
     {
-        int count = 0;
+        var count = 0;
         var bitboard = Copy();
         while (bitboard.Value > 0)
         {
@@ -86,8 +86,8 @@ public class Bitboard(ulong value)
     }
 
     // -- MASKS --
-    public static Bitboard A_FILE() => new(0x101010101010101);
-    public static Bitboard H_FILE() => new(0x8080808080808080);
+    private static Bitboard A_FILE() => new(0x101010101010101);
+    private static Bitboard H_FILE() => new(0x8080808080808080);
 
     // -- ONE-STEPS --
     // https://www.chessprogramming.org/General_Setwise_Operations#OneStepOnly
