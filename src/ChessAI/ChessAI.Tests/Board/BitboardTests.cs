@@ -1,4 +1,3 @@
-using ChessAI.Board;
 using t_square = ChessAI.Board.Board.Square;
 
 namespace ChessAI.Tests.Board;

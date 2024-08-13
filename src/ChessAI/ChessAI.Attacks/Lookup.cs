@@ -1,18 +1,9 @@
-﻿using ChessAI.Shared;
+﻿using ChessAI.Model;
 
-namespace ChessAI.Board;
+namespace ChessAI.Attacks;
 
-public class Lookup
+public sealed class Lookup
 {
-    private readonly int _sides = EnumExtensions.Count<Board.Side>();
-    private readonly int _squares = EnumExtensions.Count<Board.Square>();
-
-    private readonly Bitboard[,] _pawnAttacks;
-    private readonly Bitboard[] _knightAttacks;
-    private readonly Bitboard[] _kingAttacks;
-    private readonly Bitboard[,] _bishopAttacks;
-    private readonly Bitboard[,] _rookAttacks;
-
     // This means: if a bishop is on a given square, how many squares are relevant
     // (not counting the edges of the board), i.e. how many squares it can move to
     public static readonly int[] BishopRelevantBits =
@@ -40,6 +31,12 @@ public class Lookup
         12, 11, 11, 11, 11, 11, 11, 12,
     ];
 
+    private readonly Bitboard[,] _pawnAttacks;
+    private readonly Bitboard[] _knightAttacks;
+    private readonly Bitboard[] _kingAttacks;
+    private readonly Bitboard[,] _bishopAttacks;
+    private readonly Bitboard[,] _rookAttacks;
+    
     private readonly ulong[] _bishopMagicNumbers;
     private readonly ulong[] _rookMagicNumbers;
 
@@ -48,13 +45,13 @@ public class Lookup
 
     public Lookup()
     {
-        _pawnAttacks = new Bitboard[_sides, _squares];
-        _knightAttacks = new Bitboard[_squares];
-        _kingAttacks = new Bitboard[_squares];
-        _bishopAttacks = new Bitboard[_squares, 512];
-        _rookAttacks = new Bitboard[_squares, 4096];
-        _bishopMasks = new Bitboard[_squares];
-        _rookMasks = new Bitboard[_squares];
+        _pawnAttacks = new Bitboard[Board.NumberOfSides, Board.NumberOfSquares];
+        _knightAttacks = new Bitboard[Board.NumberOfSquares];
+        _kingAttacks = new Bitboard[Board.NumberOfSquares];
+        _bishopAttacks = new Bitboard[Board.NumberOfSquares, 512];
+        _rookAttacks = new Bitboard[Board.NumberOfSquares, 4096];
+        _bishopMasks = new Bitboard[Board.NumberOfSquares];
+        _rookMasks = new Bitboard[Board.NumberOfSquares];
         
         var magicNumbersGenerator = new MagicNumbersGenerator();
         var magicNumbers = magicNumbersGenerator.InitMagicNumbers();
@@ -70,22 +67,22 @@ public class Lookup
 
     private void InitializePawnAttacks()
     {
-        for (var square = 0; square < _squares; square++)
+        for (var square = 0; square < Board.NumberOfSquares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
-            bb.SetBit((Board.Square)square);
+            bb.SetBit((Square)square);
 
-            _pawnAttacks[(int)Board.Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
-            _pawnAttacks[(int)Board.Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
+            _pawnAttacks[(int)Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
+            _pawnAttacks[(int)Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
         }
     }
 
     private void InitializeKnightAttacks()
     {
-        for (var square = 0; square < _squares; square++)
+        for (var square = 0; square < Board.NumberOfSquares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
-            bb.SetBit((Board.Square)square);
+            bb.SetBit((Square)square);
 
             _knightAttacks[square] =
                 bb.RankUp().RankUp().FileDown() |
@@ -101,10 +98,10 @@ public class Lookup
 
     private void InitializeKingAttacks()
     {
-        for (var square = 0; square < _squares; square++)
+        for (var square = 0; square < Board.NumberOfSquares; square++)
         {
             var bb = Bitboard.EmptyBitboard();
-            bb.SetBit((Board.Square)square);
+            bb.SetBit((Square)square);
 
             _kingAttacks[square] =
                 bb.RankDown() | bb.RankUp() | bb.FileDown() | bb.FileUp() |
@@ -116,7 +113,7 @@ public class Lookup
     // See: https://www.chessprogramming.org/Magic_Bitboards
     private void InitializeBishopAttacks()
     {
-        for (var square = 0; square < _squares; square++)
+        for (var square = 0; square < Board.NumberOfSquares; square++)
         {
             _bishopMasks[square] = CalculateBishopRelevantOccupancyBitboard(square);
             var attackMask = _bishopMasks[square];
@@ -127,7 +124,7 @@ public class Lookup
             {
                 var occupancy = attackMask.SetOccupancy(index, relevantBitsCount);
                 var magicIndex =
-                    Convert.ToInt32(((occupancy * _bishopMagicNumbers[square]) >> (64 - BishopRelevantBits[square]))
+                    Convert.ToInt32(((occupancy * _bishopMagicNumbers[square]) >> (Board.NumberOfSquares - BishopRelevantBits[square]))
                         .Value);
                 _bishopAttacks[square, magicIndex] = CalculateBishopAttacks(square, occupancy);
             }
@@ -136,7 +133,7 @@ public class Lookup
 
     private void InitializeRookAttacks()
     {
-        for (var square = 0; square < _squares; square++)
+        for (var square = 0; square < Board.NumberOfSquares; square++)
         {
             _rookMasks[square] = CalculateRookRelevantOccupancyBitboard(square);
             var attackMask = _rookMasks[square];
@@ -147,7 +144,7 @@ public class Lookup
             {
                 var occupancy = attackMask.SetOccupancy(index, relevantBitsCount);
                 var magicIndex =
-                    Convert.ToInt32(((occupancy * _rookMagicNumbers[square]) >> (64 - RookRelevantBits[square]))
+                    Convert.ToInt32(((occupancy * _rookMagicNumbers[square]) >> (Board.NumberOfSquares - RookRelevantBits[square]))
                         .Value);
                 _rookAttacks[square, magicIndex] = CalculateRookAttacks(square, occupancy);
             }
@@ -162,14 +159,14 @@ public class Lookup
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
-        var targetRank = square / 8;
-        var targetFile = square % 8;
+        var targetRank = square / Board.NumberOfFiles;
+        var targetFile = square % Board.NumberOfFiles;
 
         // For each diagonal, initialize
         int rank = targetRank + 1, file = targetFile + 1;
         while (rank <= 6 && file <= 6)
         {
-            bb |= mask << (rank * 8 + file);
+            bb |= mask << (rank * Board.NumberOfFiles + file);
             rank++;
             file++;
         }
@@ -178,7 +175,7 @@ public class Lookup
         file = targetFile + 1;
         while (rank >= 1 && file <= 6)
         {
-            bb |= mask << (rank * 8 + file);
+            bb |= mask << (rank * Board.NumberOfFiles + file);
             rank--;
             file++;
         }
@@ -187,7 +184,7 @@ public class Lookup
         file = targetFile - 1;
         while (rank <= 6 && file >= 1)
         {
-            bb |= mask << (rank * 8 + file);
+            bb |= mask << (rank * Board.NumberOfFiles + file);
             rank++;
             file--;
         }
@@ -196,7 +193,7 @@ public class Lookup
         file = targetFile - 1;
         while (rank >= 1 && file >= 1)
         {
-            bb |= mask << (rank * 8 + file);
+            bb |= mask << (rank * Board.NumberOfFiles + file);
             rank--;
             file--;
         }
@@ -212,35 +209,35 @@ public class Lookup
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
-        var targetRank = square / 8;
-        var targetFile = square % 8;
+        var targetRank = square / Board.NumberOfFiles;
+        var targetFile = square % Board.NumberOfFiles;
 
         // For each line, initialize
         var rank = targetRank + 1;
         while (rank <= 6)
         {
-            bb |= mask << (rank * 8 + targetFile);
+            bb |= mask << (rank * Board.NumberOfFiles + targetFile);
             rank++;
         }
 
         rank = targetRank - 1;
         while (rank >= 1)
         {
-            bb |= mask << (rank * 8 + targetFile);
+            bb |= mask << (rank * Board.NumberOfFiles + targetFile);
             rank--;
         }
 
         var file = targetFile + 1;
         while (file <= 6)
         {
-            bb |= mask << (targetRank * 8 + file);
+            bb |= mask << (targetRank * Board.NumberOfFiles + file);
             file++;
         }
 
         file = targetFile - 1;
         while (file >= 1)
         {
-            bb |= mask << (targetRank * 8 + file);
+            bb |= mask << (targetRank * Board.NumberOfFiles + file);
             file--;
         }
 
@@ -252,17 +249,17 @@ public class Lookup
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
-        var targetRank = bishopSquare / 8;
-        var targetFile = bishopSquare % 8;
+        var targetRank = bishopSquare / Board.NumberOfFiles;
+        var targetFile = bishopSquare % Board.NumberOfFiles;
 
         // For each diagonal, initialize
         int rank = targetRank + 1, file = targetFile + 1;
         while (rank <= 7 && file <= 7)
         {
-            var square = rank * 8 + file;
+            var square = rank * Board.NumberOfFiles + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -275,10 +272,10 @@ public class Lookup
         file = targetFile + 1;
         while (rank >= 0 && file <= 7)
         {
-            var square = rank * 8 + file;
+            var square = rank * Board.NumberOfFiles + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -291,10 +288,10 @@ public class Lookup
         file = targetFile - 1;
         while (rank <= 7 && file >= 0)
         {
-            var square = rank * 8 + file;
+            var square = rank * Board.NumberOfFiles + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -307,10 +304,10 @@ public class Lookup
         file = targetFile - 1;
         while (rank >= 0 && file >= 0)
         {
-            var square = rank * 8 + file;
+            var square = rank * Board.NumberOfFiles + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -327,17 +324,17 @@ public class Lookup
     {
         var bb = Bitboard.EmptyBitboard();
         var mask = new Bitboard(1);
-        var targetRank = rookSquare / 8;
-        var targetFile = rookSquare % 8;
+        var targetRank = rookSquare / Board.NumberOfRanks;
+        var targetFile = rookSquare % Board.NumberOfRanks;
 
         // For each line, initialize
         var rank = targetRank + 1;
         while (rank <= 6)
         {
-            var square = rank * 8 + targetFile;
+            var square = rank * Board.NumberOfRanks + targetFile;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -348,10 +345,10 @@ public class Lookup
         rank = targetRank - 1;
         while (rank >= 1)
         {
-            var square = rank * 8 + targetFile;
+            var square = rank * Board.NumberOfRanks + targetFile;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -362,10 +359,10 @@ public class Lookup
         var file = targetFile + 1;
         while (file <= 6)
         {
-            var square = targetRank * 8 + file;
+            var square = targetRank * Board.NumberOfRanks + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -376,10 +373,10 @@ public class Lookup
         file = targetFile - 1;
         while (file >= 1)
         {
-            var square = targetRank * 8 + file;
+            var square = targetRank * Board.NumberOfRanks + file;
             bb |= mask << (square);
 
-            if (occupancy.GetBit((Board.Square)square) == 1)
+            if (occupancy.GetBit((Square)square) == 1)
             {
                 break;
             }
@@ -395,7 +392,7 @@ public class Lookup
         var occupancyCopy = occupancy.Copy();
         occupancyCopy &= _bishopMasks[square];
         occupancyCopy *= _bishopMagicNumbers[square];
-        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (64 - BishopRelevantBits[square])).Value);
+        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (Board.NumberOfSquares - BishopRelevantBits[square])).Value);
         return _bishopAttacks[square, occupancyIndex];
     }
     
@@ -404,7 +401,7 @@ public class Lookup
         var occupancyCopy = occupancy.Copy();
         occupancyCopy &= _rookMasks[square];
         occupancyCopy *= _rookMagicNumbers[square];
-        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (64 - RookRelevantBits[square])).Value);
+        var occupancyIndex = Convert.ToInt32((occupancyCopy >> (Board.NumberOfSquares - RookRelevantBits[square])).Value);
         return _rookAttacks[square, occupancyIndex];
     }
 }
