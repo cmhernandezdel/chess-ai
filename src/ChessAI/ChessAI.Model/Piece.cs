@@ -1,4 +1,6 @@
-﻿namespace ChessAI.Model;
+﻿using ChessAI.Shared;
+
+namespace ChessAI.Model;
 
 public enum Piece
 {
