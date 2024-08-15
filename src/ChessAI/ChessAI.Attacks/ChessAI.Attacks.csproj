@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ChessAI.Model\ChessAI.Model.csproj" />
+      <ProjectReference Include="..\ChessAI.Shared\ChessAI.Shared.csproj" />
+    </ItemGroup>
+
+</Project>
