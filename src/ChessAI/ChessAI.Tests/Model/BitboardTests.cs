@@ -1,6 +1,7 @@
-using t_square = ChessAI.Board.Board.Square;
+using ChessAI.Model;
+using t_square = ChessAI.Model.Square;
 
-namespace ChessAI.Tests.Board;
+namespace ChessAI.Tests.Model;
 
 // Tool used to convert from decimal to binary:
 // https://www.rapidtables.com/convert/number/decimal-to-binary.html
@@ -38,7 +39,7 @@ public sealed class BitboardTests
     {
         var initialBitboard = new Bitboard(initialRawBitboard);
         var expectedBitboard = new Bitboard(expectedRawBitboard);
-        t_square square = (t_square)index;
+        var square = (t_square)index;
         initialBitboard.SetBit(square);
         Assert.Equal(expectedBitboard, initialBitboard);
     }
@@ -50,7 +51,7 @@ public sealed class BitboardTests
     {
         var initialBitboard = new Bitboard(initialRawBitboard);
         var expectedBitboard = new Bitboard(expectedRawBitboard);
-        t_square square = (t_square)index;
+        var square = (t_square)index;
         initialBitboard.UnsetBit(square);
         Assert.Equal(expectedBitboard, initialBitboard);
     }

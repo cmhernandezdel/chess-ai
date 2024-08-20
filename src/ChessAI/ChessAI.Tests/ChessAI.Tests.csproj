@@ -22,4 +22,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ChessAI.Attacks\ChessAI.Attacks.csproj" />
+    <ProjectReference Include="..\ChessAI.Game\ChessAI.Game.csproj" />
+    <ProjectReference Include="..\ChessAI.Model\ChessAI.Model.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -19,19 +19,19 @@ namespace ChessAI.Game;
 /// </summary>
 public sealed class Game
 {
-    private Bitboard WhiteKing = new(0x1000000000000000);
-    private Bitboard WhiteQueens = new(0x800000000000000);
-    private Bitboard WhiteBishops = new(0x2400000000000000);
-    private Bitboard WhiteKnights = new(0x4200000000000000);
-    private Bitboard WhiteRooks = new(0x8100000000000000);
-    private Bitboard WhitePawns = new(0xff000000000000);
+    public Bitboard WhiteKing = new(0x1000000000000000);
+    public Bitboard WhiteQueens = new(0x800000000000000);
+    public Bitboard WhiteBishops = new(0x2400000000000000);
+    public Bitboard WhiteKnights = new(0x4200000000000000);
+    public Bitboard WhiteRooks = new(0x8100000000000000);
+    public Bitboard WhitePawns = new(0xff000000000000);
 
-    private Bitboard BlackKing = new(0x0000000000000010);
-    private Bitboard BlackQueens = new(0x0000000000000008);
-    private Bitboard BlackBishops = new(0x0000000000000024);
-    private Bitboard BlackKnights = new(0x0000000000000042);
-    private Bitboard BlackRooks = new(0x0000000000000081);
-    private Bitboard BlackPawns = new(0x000000000000ff00);
+    public Bitboard BlackKing = new(0x0000000000000010);
+    public Bitboard BlackQueens = new(0x0000000000000008);
+    public Bitboard BlackBishops = new(0x0000000000000024);
+    public Bitboard BlackKnights = new(0x0000000000000042);
+    public Bitboard BlackRooks = new(0x0000000000000081);
+    public Bitboard BlackPawns = new(0x000000000000ff00);
 
     public Bitboard[] PieceBitboards;
 
