@@ -398,6 +398,22 @@ public sealed class Lookup
     
     public Bitboard GetRookAttacks(int square, Bitboard occupancy)
     {
+        var occupancyCopyR = occupancy.Copy();
+        var occupancyCopyB = occupancy.Copy();
+        
+        occupancyCopyR &= _rookMasks[square];
+        occupancyCopyB &= _bishopMasks[square];
+        
+        occupancyCopyR *= _rookMagicNumbers[square];
+        occupancyCopyB *= _bishopMagicNumbers[square];
+        
+        var occupancyIndexB = Convert.ToInt32((occupancyCopyB >> (Board.NumberOfSquares - BishopRelevantBits[square])).Value);
+        var occupancyIndexR = Convert.ToInt32((occupancyCopyR >> (Board.NumberOfSquares - RookRelevantBits[square])).Value);
+        return _bishopAttacks[square, occupancyIndexB] | _rookAttacks[square, occupancyIndexR];
+    }
+
+    public Bitboard GetQueenAttacks(int square, Bitboard occupancy)
+    {
         var occupancyCopy = occupancy.Copy();
         occupancyCopy &= _rookMasks[square];
         occupancyCopy *= _rookMagicNumbers[square];
