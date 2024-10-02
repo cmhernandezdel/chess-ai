@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ChessAI.Attacks\ChessAI.Attacks.csproj" />
       <ProjectReference Include="..\ChessAI.Model\ChessAI.Model.csproj" />
       <ProjectReference Include="..\ChessAI.Shared\ChessAI.Shared.csproj" />
     </ItemGroup>

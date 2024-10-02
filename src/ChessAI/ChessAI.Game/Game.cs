@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using ChessAI.Model;
+using ChessLookup = ChessAI.Attacks.Lookup;
 
 namespace ChessAI.Game;
 
@@ -45,6 +46,8 @@ public sealed class Game
     public int HalfMovesSinceLastCaptureOrPawnAdvance = 0;
     public int FullMoves = 0;
 
+    private readonly ChessLookup _lookup;
+
     public Game()
     {
         PieceBitboards =
@@ -52,6 +55,8 @@ public sealed class Game
             WhitePawns, WhiteKnights, WhiteBishops, WhiteRooks, WhiteQueens, WhiteKing,
             BlackPawns, BlackKnights, BlackBishops, BlackRooks, BlackQueens, BlackKing
         ];
+
+        _lookup = new ChessLookup();
     }
 
     public static Game FromFenString(string fen)
@@ -60,6 +65,52 @@ public sealed class Game
         return game;
     }
 
+    // Checks if a square is attacked by the side passed as argument
+    public bool IsSquareAttacked(Square square, Side side)
+    {
+        if (side == Side.White &&
+            ((_lookup.PawnAttacks[(int)Side.Black, (int)square]) & WhitePawns).CountBits() > 0)
+        {
+            return true;
+        }
+
+        if (side == Side.Black &&
+            ((_lookup.PawnAttacks[(int)Side.White, (int)square]) & BlackPawns).CountBits() > 0)
+        {
+            return true;
+        }
+
+        if ((_lookup.KnightAttacks[(int)square] & ((side == Side.White) ? WhiteKnights : BlackKnights)).CountBits() > 0)
+        {
+            return true;
+        }
+        
+        if ((_lookup.KingAttacks[(int)square] & ((side == Side.White) ? WhiteKing : BlackKing)).CountBits() > 0)
+        {
+            return true;
+        }
+
+        if ((_lookup.GetBishopAttacks((int)square, BoardOccupancy) &
+             ((side == Side.White) ? WhiteBishops : BlackBishops)).CountBits() > 0)
+        {
+            return true;
+        }
+        
+        if ((_lookup.GetRookAttacks((int)square, BoardOccupancy) &
+             ((side == Side.White) ? WhiteRooks : BlackBishops)).CountBits() > 0)
+        {
+            return true;
+        }
+        
+        if ((_lookup.GetQueenAttacks((int)square, BoardOccupancy) &
+             ((side == Side.White) ? WhiteQueens : BlackQueens)).CountBits() > 0)
+        {
+            return true;
+        }
+        
+        return false;
+    } 
+    
     public override string ToString()
     {
         StringBuilder sb = new();

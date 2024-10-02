@@ -31,11 +31,11 @@ public sealed class Lookup
         12, 11, 11, 11, 11, 11, 11, 12,
     ];
 
-    private readonly Bitboard[,] _pawnAttacks;
-    private readonly Bitboard[] _knightAttacks;
-    private readonly Bitboard[] _kingAttacks;
-    private readonly Bitboard[,] _bishopAttacks;
-    private readonly Bitboard[,] _rookAttacks;
+    public readonly Bitboard[,] PawnAttacks;
+    public readonly Bitboard[] KnightAttacks;
+    public readonly Bitboard[] KingAttacks;
+    public readonly Bitboard[,] BishopAttacks;
+    public readonly Bitboard[,] RookAttacks;
     
     private readonly ulong[] _bishopMagicNumbers;
     private readonly ulong[] _rookMagicNumbers;
@@ -45,11 +45,11 @@ public sealed class Lookup
 
     public Lookup()
     {
-        _pawnAttacks = new Bitboard[Board.NumberOfSides, Board.NumberOfSquares];
-        _knightAttacks = new Bitboard[Board.NumberOfSquares];
-        _kingAttacks = new Bitboard[Board.NumberOfSquares];
-        _bishopAttacks = new Bitboard[Board.NumberOfSquares, 512];
-        _rookAttacks = new Bitboard[Board.NumberOfSquares, 4096];
+        PawnAttacks = new Bitboard[Board.NumberOfSides, Board.NumberOfSquares];
+        KnightAttacks = new Bitboard[Board.NumberOfSquares];
+        KingAttacks = new Bitboard[Board.NumberOfSquares];
+        BishopAttacks = new Bitboard[Board.NumberOfSquares, 512];
+        RookAttacks = new Bitboard[Board.NumberOfSquares, 4096];
         _bishopMasks = new Bitboard[Board.NumberOfSquares];
         _rookMasks = new Bitboard[Board.NumberOfSquares];
         
@@ -72,8 +72,8 @@ public sealed class Lookup
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Square)square);
 
-            _pawnAttacks[(int)Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
-            _pawnAttacks[(int)Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
+            PawnAttacks[(int)Side.White, square] = bb.RankUp().FileDown() | bb.RankUp().FileUp();
+            PawnAttacks[(int)Side.Black, square] = bb.RankDown().FileDown() | bb.RankDown().FileUp();
         }
     }
 
@@ -84,7 +84,7 @@ public sealed class Lookup
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Square)square);
 
-            _knightAttacks[square] =
+            KnightAttacks[square] =
                 bb.RankUp().RankUp().FileDown() |
                 bb.RankUp().RankUp().FileUp() |
                 bb.RankDown().RankDown().FileDown() |
@@ -103,7 +103,7 @@ public sealed class Lookup
             var bb = Bitboard.EmptyBitboard();
             bb.SetBit((Square)square);
 
-            _kingAttacks[square] =
+            KingAttacks[square] =
                 bb.RankDown() | bb.RankUp() | bb.FileDown() | bb.FileUp() |
                 bb.RankDown().FileDown() | bb.RankDown().FileUp() |
                 bb.RankUp().FileDown() | bb.RankUp().FileUp();
@@ -126,7 +126,7 @@ public sealed class Lookup
                 var magicIndex =
                     Convert.ToInt32(((occupancy * _bishopMagicNumbers[square]) >> (Board.NumberOfSquares - BishopRelevantBits[square]))
                         .Value);
-                _bishopAttacks[square, magicIndex] = CalculateBishopAttacks(square, occupancy);
+                BishopAttacks[square, magicIndex] = CalculateBishopAttacks(square, occupancy);
             }
         }
     }
@@ -146,7 +146,7 @@ public sealed class Lookup
                 var magicIndex =
                     Convert.ToInt32(((occupancy * _rookMagicNumbers[square]) >> (Board.NumberOfSquares - RookRelevantBits[square]))
                         .Value);
-                _rookAttacks[square, magicIndex] = CalculateRookAttacks(square, occupancy);
+                RookAttacks[square, magicIndex] = CalculateRookAttacks(square, occupancy);
             }
         }
     }
@@ -393,7 +393,7 @@ public sealed class Lookup
         occupancyCopy &= _bishopMasks[square];
         occupancyCopy *= _bishopMagicNumbers[square];
         var occupancyIndex = Convert.ToInt32((occupancyCopy >> (Board.NumberOfSquares - BishopRelevantBits[square])).Value);
-        return _bishopAttacks[square, occupancyIndex];
+        return BishopAttacks[square, occupancyIndex];
     }
     
     public Bitboard GetRookAttacks(int square, Bitboard occupancy)
@@ -409,7 +409,7 @@ public sealed class Lookup
         
         var occupancyIndexB = Convert.ToInt32((occupancyCopyB >> (Board.NumberOfSquares - BishopRelevantBits[square])).Value);
         var occupancyIndexR = Convert.ToInt32((occupancyCopyR >> (Board.NumberOfSquares - RookRelevantBits[square])).Value);
-        return _bishopAttacks[square, occupancyIndexB] | _rookAttacks[square, occupancyIndexR];
+        return BishopAttacks[square, occupancyIndexB] | RookAttacks[square, occupancyIndexR];
     }
 
     public Bitboard GetQueenAttacks(int square, Bitboard occupancy)
@@ -418,6 +418,6 @@ public sealed class Lookup
         occupancyCopy &= _rookMasks[square];
         occupancyCopy *= _rookMagicNumbers[square];
         var occupancyIndex = Convert.ToInt32((occupancyCopy >> (Board.NumberOfSquares - RookRelevantBits[square])).Value);
-        return _rookAttacks[square, occupancyIndex];
+        return RookAttacks[square, occupancyIndex];
     }
 }
